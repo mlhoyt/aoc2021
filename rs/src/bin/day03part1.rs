@@ -6,11 +6,16 @@ const FILE_NAME: &str = "input/day03.txt";
 fn main() {
     let input = aoc::read_file(FILE_NAME).expect("cannot read file");
 
+    // Parse the input into a list of lists of bools (not 1's and 0's)
     let codes = parser::parse(&input).expect("cannot parse input");
     // println!("{:#?}", codes);
 
     let code_len = codes[0].len();
     let codes_mid = (codes.len() / 2) as f32;
+
+    // Gamma Rate is the most common value for the corresponding position found by summing the true
+    // values and comparing the resulting sum against the middle "number of values".
+    // NOTE: This is a SIMD approach to the "most common" (or majority) value per position.
     let gamma = codes
         .iter()
         .fold(vec![0; code_len], |acc, v| {
@@ -26,7 +31,10 @@ fn main() {
     let gamma_int = rate_to_usize(&gamma);
     println!("{:?} {}", gamma, gamma_int);
 
+    // Gamma Rate is the least common value for the corresponding position found by inverting the
+    // result of the Gamma Rate.
     let epsilon = gamma.iter().map(|&v| !v).collect::<Vec<_>>();
+
     let epsilon_int = rate_to_usize(&epsilon);
     println!("{:?} {}", epsilon, epsilon_int);
 

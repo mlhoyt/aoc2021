@@ -6,9 +6,15 @@ const FILE_NAME: &str = "input/day03.txt";
 fn main() {
     let input = aoc::read_file(FILE_NAME).expect("cannot read file");
 
+    // Parse the input into a list of lists of bools (not 1's and 0's)
     let codes = parser::parse(&input).expect("cannot parse input");
     // println!("{:#?}", codes);
 
+    // Oxygen Generator Rate reduces the list of codes based on the most common value in a position
+    // (defaulting to 1's if the 1's and 0's counts are equal) followed by the codes that match
+    // that value in the subsequent position until all positions are processed and only one value
+    // remains.
+    // NOTE: This is a SISD approach to the "most common" (or majority) value per position.
     let mut oxygen_codes = codes.clone();
     (0..codes[0].len()).for_each(|i| {
         if oxygen_codes.len() <= 1 {
@@ -23,9 +29,12 @@ fn main() {
             .filter(|code| code[i] == v)
             .collect::<Vec<_>>();
     });
+
     let oxygen_int = rate_to_usize(&oxygen_codes[0]);
     println!("{:?} {}", oxygen_codes[0], oxygen_int);
 
+    // CO2 Scrubber Rate is basically the inverse of the Oxygen Generator Rate using the least
+    // common value per position (and defaulting to 0 if counts are equal).
     let mut co2_scrubber_codes = codes.clone();
     (0..codes[0].len()).for_each(|i| {
         if co2_scrubber_codes.len() <= 1 {
@@ -40,6 +49,7 @@ fn main() {
             .filter(|code| code[i] == v)
             .collect::<Vec<_>>();
     });
+
     let co2_scrubber_int = rate_to_usize(&co2_scrubber_codes[0]);
     println!("{:?} {}", co2_scrubber_codes[0], co2_scrubber_int);
 
