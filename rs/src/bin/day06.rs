@@ -6,7 +6,7 @@ const FILE_NAME: &str = "input/day06.txt";
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let input = aoc::read_file(FILE_NAME)?;
 
-    // Parse the input into a list of unsigned integers
+    // Parse the input into a map of days-to-respawn to count
     let fish = parse(&input)?;
     // println!("{:?}", fish);
 
