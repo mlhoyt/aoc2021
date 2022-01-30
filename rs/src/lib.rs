@@ -1,42 +1,47 @@
 use std::error::Error;
-use std::fmt;
-use std::fs;
 use std::io::{BufRead, BufReader};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ReadFileError {
+pub struct AocError {
     details: String,
 }
 
-impl ReadFileError {
-    fn new(s: &str) -> Self {
+impl AocError {
+    pub fn new(s: &str) -> Self {
         Self {
             details: s.to_string(),
         }
     }
 }
 
-impl fmt::Display for ReadFileError {
-    fn fmt(&self, fmt: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl std::fmt::Display for AocError {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(fmt, "{}", self.details)
     }
 }
 
-impl Error for ReadFileError {
+impl std::error::Error for AocError {
     fn description(&self) -> &str {
         &self.details
     }
 }
 
-impl From<std::io::Error> for ReadFileError {
+impl From<std::io::Error> for AocError {
     fn from(err: std::io::Error) -> Self {
         #[allow(deprecated)]
-        ReadFileError::new(err.description())
+        Self::new(err.description())
     }
 }
 
-pub fn read_file(name: &str) -> Result<String, ReadFileError> {
-    let file = fs::File::open(name)?;
+impl From<peg::error::ParseError<peg::str::LineCol>> for AocError {
+    fn from(err: peg::error::ParseError<peg::str::LineCol>) -> Self {
+        #[allow(deprecated)]
+        Self::new(err.description())
+    }
+}
+
+pub fn read_file(name: &str) -> Result<String, AocError> {
+    let file = std::fs::File::open(name)?;
     let mut file = BufReader::new(file);
 
     let mut input = String::new();
