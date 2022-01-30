@@ -1,20 +1,10 @@
 use aoc;
 
-// const FILE_NAME: &str = "input/day06.test.txt";
-const FILE_NAME: &str = "input/day06.txt";
-
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let input = aoc::read_file(FILE_NAME)?;
-
-    // Parse the input into a map of days-to-respawn to count
-    let fish = parse(&input)?;
-    // println!("{:?}", fish);
-
-    let part1_result = simulate(fish.clone(), 80);
-    println!("part1: {:?}", part1_result);
-
-    let part2_result = simulate(fish.clone(), 256);
-    println!("part2: {:?}", part2_result);
+    let input = aoc::read_file("input/day06.txt")?;
+    let data = parse(&input)?;
+    println!("part1: {:?}", simulate(data.clone(), 80));
+    println!("part2: {:?}", simulate(data.clone(), 256));
 
     Ok(())
 }
