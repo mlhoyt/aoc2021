@@ -1,6 +1,8 @@
 use std::error::Error;
 use std::io::{BufRead, BufReader};
 
+pub mod grid2d;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AocError {
     details: String,
