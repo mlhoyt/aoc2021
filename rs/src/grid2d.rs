@@ -3,7 +3,7 @@ use crate::AocError;
 // Leverage https://github.com/mlhoyt/aoc2020/blob/main/rs/src/bin/day11part2.rs "Layout"
 // 2D grid abstraction.
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Grid2D<T: Copy> {
     grid: Vec<T>,
     width: usize,
@@ -11,12 +11,16 @@ pub struct Grid2D<T: Copy> {
 }
 
 impl<T: Copy> Grid2D<T> {
-    pub fn new(rows: &[Vec<T>]) -> Result<Self, AocError> {
-        let mut rv = Self {
+    fn init() -> Self {
+        Self {
             grid: vec![],
             width: 0,
             height: 0,
-        };
+        }
+    }
+
+    pub fn new(rows: &[Vec<T>]) -> Result<Self, AocError> {
+        let mut rv = Self::init();
 
         for (i, r) in rows.iter().enumerate() {
             if i == 0 {
@@ -45,6 +49,16 @@ impl<T: Copy> Grid2D<T> {
         match self.yx_to_index(y, x) {
             None => None,
             Some(i) => Some(self.grid[i]),
+        }
+    }
+
+    fn set_yx(&mut self, y: usize, x: usize, v: T) -> Option<usize> {
+        match self.yx_to_index(y, x) {
+            Some(i) => {
+                self.grid[i] = v;
+                Some(i)
+            }
+            _ => None,
         }
     }
 
@@ -93,6 +107,34 @@ impl<'a, T: Copy> Iterator for Grid2DIter<'a, T> {
                 value: self.grid.get_yx(pos.0, pos.1).unwrap(),
             })
         }
+    }
+}
+
+impl<T: Copy + Default> std::iter::FromIterator<Grid2DPoint<T>> for Grid2D<T> {
+    fn from_iter<I: std::iter::IntoIterator<Item = Grid2DPoint<T>>>(iter: I) -> Self {
+        let mut max_x = 0;
+        let mut max_y = 0;
+        let mut ps = vec![];
+
+        // determine width and height and capture points
+        for i in iter {
+            max_x = max_x.max(i.x);
+            max_y = max_y.max(i.y);
+            ps.push(i);
+        }
+
+        // initialize Grid2D with discovered width and height
+        let mut rv = Grid2D::<T>::init();
+        rv.width = max_x + 1;
+        rv.height = max_y + 1;
+        rv.grid = vec![T::default(); rv.width * rv.height];
+
+        // populate Grid2D values with captured points
+        ps.iter().for_each(|p| {
+            rv.set_yx(p.y, p.x, p.value);
+        });
+
+        rv
     }
 }
 
